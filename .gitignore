@@ -1,0 +1,23 @@
+# ===== Java / Maven =====
+target/
+*.class
+.mvn/timing.properties
+
+# ===== Android / Gradle =====
+.gradle/
+build/
+local.properties
+captures/
+.externalNativeBuild/
+.cxx/
+
+# ===== IDE =====
+.idea/
+*.iml
+.vscode/
+*.swp
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+*.log
