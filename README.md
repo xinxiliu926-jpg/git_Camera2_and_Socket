@@ -1,0 +1,2 @@
+# git_Camera2_and_Socket
+其中有我的camera 2练手项目和我之前写的socket聊天室的项目。
