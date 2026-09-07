@@ -25,9 +25,9 @@ public class ImagePreviewActivity extends AppCompatActivity {
 
         // 获取传递过来的base64
         String base64 = getIntent().getStringExtra(EXTRA_BASE64);
-        if(base64 != null){
+        if (base64 != null) {
             byte[] bytes = Base64.decode(base64, Base64.DEFAULT);
-            Bitmap bitmap = BitmapFactory.decodeByteArray(bytes,0,bytes.length);
+            Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
             ivPreview.setImageBitmap(bitmap);
         }
 

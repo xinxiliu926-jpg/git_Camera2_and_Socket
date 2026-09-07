@@ -25,7 +25,7 @@ public class ClientUI {
         this(JOptionPane.showInputDialog(null, "请输入你的聊天室昵称：", "登录", JOptionPane.PLAIN_MESSAGE));
     }
 
-    // 旧流程：直接按昵称连接（发送昵称作为身份，不校验账号）
+    
     public ClientUI(String nickname) {
         if (nickname == null || nickname.trim().isEmpty()) {
             nickname = "匿名用户";
@@ -36,7 +36,6 @@ public class ClientUI {
         connectToServer();
     }
 
-    // 新流程：登录成功后复用已连接的 Socket 进入聊天室
     public ClientUI(Socket socket, BufferedReader reader, PrintWriter writer, String nickname) {
         this.socket = socket;
         this.reader = reader;
@@ -63,7 +62,7 @@ public class ClientUI {
         mainPanel.setBackground(new Color(240, 240, 240));
 
         // 状态栏
-        statusLabel = new JLabel("● 连接中...", SwingConstants.CENTER);
+        statusLabel = new JLabel("连接中...", SwingConstants.CENTER);
         statusLabel.setFont(font);
         statusLabel.setForeground(new Color(0, 150, 0));
         statusLabel.setOpaque(true);

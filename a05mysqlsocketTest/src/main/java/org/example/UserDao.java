@@ -6,8 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class UserDao {
-    // 注册：插入 username, password, nickname（nickname 可选，不传则用 username）
-    public boolean register(String username, String password, String nickname) {
+       public boolean register(String username, String password, String nickname) {
         // 先检查用户名是否已存在（数据库 username 未加唯一约束时也能拦截重复）
         if (existsByUsername(username)) {
             System.out.println("用户名已存在: " + username);

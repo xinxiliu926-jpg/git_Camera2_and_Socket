@@ -8,9 +8,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-/**
- * 注册界面：向 MySQL chat_db.user 表插入新用户。
- */
 public class RegisterUI {
 
     private JFrame frame;

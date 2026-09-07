@@ -8,10 +8,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-/**
- * 登录界面：连接 MySQL 的 chat_db.user 表校验账号密码。
- * 登录成功后，用昵称进入聊天室 ClientUI。
- */
+
 public class LoginUI {
 
     private JFrame frame;

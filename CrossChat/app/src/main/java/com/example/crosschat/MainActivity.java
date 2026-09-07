@@ -17,7 +17,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Button but;
     private Button but_1;
-    private  Button but_3;
+    private Button but_3;
 
     private EditText etUser;
 
@@ -28,13 +28,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         etUser = findViewById(R.id.et_username);
-        but=findViewById(R.id.button);
-        but_1=findViewById(R.id.but_1);
-        but_3=findViewById(R.id.button2_takephote);
+        but = findViewById(R.id.button);
+        but_1 = findViewById(R.id.but_1);
+        but_3 = findViewById(R.id.button2_takephote);
         but_3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this,Camera_2Activity.class));
+                startActivity(new Intent(MainActivity.this, Camera_2Activity.class));
             }
         });
         but.setOnClickListener(new View.OnClickListener() {
@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
         but_1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent1=new Intent(MainActivity.this,CameraActivity.class);
+                Intent intent1 = new Intent(MainActivity.this, CameraActivity.class);
                 startActivity(intent1);
             }
         });
@@ -61,14 +61,13 @@ public class MainActivity extends AppCompatActivity {
 
     public void Tiaozhuang(View view) {
 
-        String userName=etUser.getText().toString().trim();
-        if(userName.isEmpty())
-        {
+        String userName = etUser.getText().toString().trim();
+        if (userName.isEmpty()) {
             etUser.setError("不能为空");
             return;
         }
         Intent intent = new Intent(this, ChatActivity.class);
-        intent.putExtra("username",userName);
+        intent.putExtra("username", userName);
         startActivity(intent);
 
 

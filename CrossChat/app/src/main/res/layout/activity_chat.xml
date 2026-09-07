@@ -9,17 +9,17 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/meinv"
         android:alpha="0.4"
-        android:scaleType="centerCrop"/>
+        android:scaleType="centerCrop"
+        android:src="@drawable/meinv" />
 
     <!--上层聊天全部控件-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#22000000"
         android:orientation="vertical"
-        android:padding="12dp"
-        android:background="#22000000">
+        android:padding="12dp">
 
         <!--聊天消息展示框，滚动可以看历史消息-->
         <ScrollView
@@ -33,15 +33,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFFFF"
-                android:textSize="16sp"/>
+                android:textSize="16sp" />
         </ScrollView>
 
         <!--底部：输入框 + 文件按钮 + 发送按钮，水平排列-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
 
             <EditText
                 android:id="@+id/et_input_msg"
@@ -50,20 +50,20 @@
                 android:layout_weight="1"
                 android:hint="输入消息..."
                 android:inputType="textMultiLine"
-                android:maxLines="3"/>
+                android:maxLines="3" />
 
             <!-- 新增 文件按钮 -->
             <Button
                 android:id="@+id/btn_file"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="文件"/>
+                android:text="文件" />
 
             <Button
                 android:id="@+id/btn_send"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="发送"/>
+                android:text="发送" />
 
         </LinearLayout>
     </LinearLayout>

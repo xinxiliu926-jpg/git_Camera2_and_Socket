@@ -6,17 +6,15 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * 客户端连接工具：负责连接服务器并完成登录/注册握手。
- * 登录成功后复用同一个 Socket/流进入聊天室（不能再直连 MySQL）。
+ * 登录成功后复用同一个 Socket/流进入聊天室
  */
 public class ChatClient {
 
-    // 云服务器地址和聊天端口（改成你自己的服务器 IP）
+   
     public static final String HOST = "8.148.221.180";
     public static final int PORT = 10000;
 
-    /**
-     * 登录会话：保存已连接的 Socket 和流，直接交给 ClientUI 使用。
-     */
+    
     public static class Session {
         public Socket socket;
         public BufferedReader reader;
@@ -24,9 +22,6 @@ public class ChatClient {
         public String nickname;
     }
 
-    /**
-     * 登录：成功返回 Session（复用连接），失败返回 null，失败原因写入 failReason。
-     */
     public static Session login(String username, String password, StringBuilder failReason) {
         try {
             Socket socket = new Socket(HOST, PORT);
@@ -62,9 +57,7 @@ public class ChatClient {
         }
     }
 
-    /**
-     * 注册：成功返回 null，失败返回错误信息。
-     */
+  
     public static String register(String username, String password, String nickname) {
         try (Socket socket = new Socket(HOST, PORT);
              PrintWriter writer = new PrintWriter(

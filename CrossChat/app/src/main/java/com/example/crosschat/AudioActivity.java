@@ -2,6 +2,7 @@ package com.example.crosschat;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -68,8 +69,8 @@ public class AudioActivity extends AppCompatActivity {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 // 按下二次校验权限
-                if (!hasPermission()){
-                    Toast.makeText(AudioActivity.this,"请授予麦克风和存储权限",Toast.LENGTH_SHORT).show();
+                if (!hasPermission()) {
+                    Toast.makeText(AudioActivity.this, "请授予麦克风和存储权限", Toast.LENGTH_SHORT).show();
                     return false;
                 }
                 switch (event.getAction()) {
@@ -222,6 +223,7 @@ public class AudioActivity extends AppCompatActivity {
 //            );
 //        }
         }
+
         @Override
         public void run() {
             super.run();
@@ -265,7 +267,7 @@ public class AudioActivity extends AppCompatActivity {
                 e.printStackTrace();
                 Log.d(TAG, "zsr run: " + e.getMessage());
             } finally {
-                CloseUtils.close(fos, wavFos,wavRaf);
+                CloseUtils.close(fos, wavFos, wavRaf);
             }
         }
 

@@ -10,10 +10,9 @@ public class Server {
     public static final Map<String, ClientUser> User_Map = new HashMap<>();
     public static final Object LOCK = new Object();
 
-    // ========== 新增：视频相关 ==========
-    // 视频客户端连接列表（只存Socket，视频不需要用户身份，纯转发）
+    
     public static final ArrayList<Socket> VIDEO_CLIENTS =new ArrayList<>();
-    // 视频监听端口（云服务器安全组必须放行这个端口）
+   
     private static final int VIDEO_PORT = 9000;
 
 

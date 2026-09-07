@@ -29,7 +29,7 @@ import java.nio.charset.StandardCharsets;
 
 public class ChatActivity extends AppCompatActivity {
 
-    private  Button butFile;
+    private Button butFile;
     private Button butSend;//按钮发送
     private String username;//接受上一个的名称
 
@@ -37,35 +37,34 @@ public class ChatActivity extends AppCompatActivity {
 
     private TextView tvMsgShow;//展示界面
 
-    private  Socket socket;//定义全局变量只连接一次socket
+    private Socket socket;//定义全局变量只连接一次socket
 
-    private  OutputStream outputStream;
+    private OutputStream outputStream;
 
-    private boolean isConnect=false;
+    private boolean isConnect = false;
 
     private Uri selectedFileUri; // 保存选中文件Uri
     private String selectedFileName; // 保存文件名
 
     //回调文件接受器
-    private final ActivityResultLauncher<Intent> fileChooseLauncher=
+    private final ActivityResultLauncher<Intent> fileChooseLauncher =
             registerForActivityResult(
                     new ActivityResultContracts.StartActivityForResult(),
                     new ActivityResultCallback<ActivityResult>() {
                         @Override
                         public void onActivityResult(ActivityResult o) {
-                            if(o.getResultCode()==RESULT_OK&&o.getData()!=null)//拿到数据不为空，并且客户选择了欧克
+                            if (o.getResultCode() == RESULT_OK && o.getData() != null)//拿到数据不为空，并且客户选择了欧克
                             {
-                                Intent dataIntent=o.getData();
-                                Uri fileUri=dataIntent.getData();
-                                if(fileUri!=null)
-                                {
-                                    selectedFileUri=fileUri;// 保存选中的文件
+                                Intent dataIntent = o.getData();
+                                Uri fileUri = dataIntent.getData();
+                                if (fileUri != null) {
+                                    selectedFileUri = fileUri;// 保存选中的文件
 
-                                    selectedFileName=getFileNameByUri(fileUri);//获取文件名
+                                    selectedFileName = getFileNameByUri(fileUri);//获取文件名
 
-                                    runOnUiThread(()->
+                                    runOnUiThread(() ->
                                     {
-                                        Toast.makeText(ChatActivity.this,"已选中文件："+selectedFileName,Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(ChatActivity.this, "已选中文件：" + selectedFileName, Toast.LENGTH_SHORT).show();
                                     });
 
                                 }
@@ -78,18 +77,16 @@ public class ChatActivity extends AppCompatActivity {
             );
 
 
-
-
     @Override
-    protected void onCreate( Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);//添加xml页面
 
-      username = getIntent().getStringExtra("username");
+        username = getIntent().getStringExtra("username");
         butSend = findViewById(R.id.btn_send);
         etInputMsg = findViewById(R.id.et_input_msg);
-        tvMsgShow=findViewById(R.id.tv_msg_show);
-        butFile=findViewById(R.id.btn_file);
+        tvMsgShow = findViewById(R.id.tv_msg_show);
+        butFile = findViewById(R.id.btn_file);
 
         new Thread(this::initSocketConnect).start();//子线程
 
@@ -99,36 +96,33 @@ public class ChatActivity extends AppCompatActivity {
                 openFileSelector();
             }
         });
-        butSend.setOnClickListener(v->sendMessage());//lamble表达式
-
+        butSend.setOnClickListener(v -> sendMessage());//lamble表达式
 
 
     }
 
 
-    private  void initSocketConnect()
-    {
+    private void initSocketConnect() {
         try {
-            socket=new Socket("8.148.221.180",10000);
+            socket = new Socket("8.148.221.180", 10000);
             outputStream = socket.getOutputStream();
-            isConnect=true;
-            sendRaw(username+"\n");
+            isConnect = true;
+            sendRaw(username + "\n");
 
             InputStream is = socket.getInputStream();
-            InputStreamReader isr = new InputStreamReader(is,StandardCharsets.UTF_8);
+            InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
             BufferedReader bf = new BufferedReader(isr);
 
             String line;
-            while ((line=bf.readLine())!=null)
-            {
+            while ((line = bf.readLine()) != null) {
                 String finalLine = line;
                 System.out.println("服务器转发消息：" + finalLine);
                 // 子线程不能更新UI，切主线程更新聊天框
-                runOnUiThread(()->{
-                    if(finalLine.startsWith("FILE_IMAGE|")){
+                runOnUiThread(() -> {
+                    if (finalLine.startsWith("FILE_IMAGE|")) {
                         // 分割协议：FILE_IMAGE|文件名|大小|base64
-                        String[] parts = finalLine.split("\\|",4);
-                        if(parts.length ==4){
+                        String[] parts = finalLine.split("\\|", 4);
+                        if (parts.length == 4) {
                             String base64Data = parts[3];
                             tvMsgShow.append("【收到图片，自动打开预览】\n");
 
@@ -137,8 +131,8 @@ public class ChatActivity extends AppCompatActivity {
                             intent.putExtra(ImagePreviewActivity.EXTRA_BASE64, base64Data);
                             startActivity(intent);
                         }
-                    }else{
-                        tvMsgShow.append(finalLine+"\n");
+                    } else {
+                        tvMsgShow.append(finalLine + "\n");
                     }
                 });
 
@@ -148,23 +142,22 @@ public class ChatActivity extends AppCompatActivity {
 
         } catch (IOException e) {
             e.printStackTrace();
-            runOnUiThread(()->Toast.makeText(ChatActivity.this,"服务器连接失败",Toast.LENGTH_SHORT).show());
+            runOnUiThread(() -> Toast.makeText(ChatActivity.this, "服务器连接失败", Toast.LENGTH_SHORT).show());
 
-        }
-        finally {
+        } finally {
             // 连接断开
-            System.out.println("🔴 Socket连接已结束，进入finally");
+            System.out.println(" Socket连接已结束，进入finally");
             isConnect = false;
             closeSocket();
         }
 
     }
 
-//获取文件名的工具方法
-    private String getFileNameByUri(Uri uri){
+    //获取文件名的工具方法
+    private String getFileNameByUri(Uri uri) {
         String displayName = "";
-        try (android.database.Cursor cursor = getContentResolver().query(uri, null, null, null, null)){
-            if(cursor != null && cursor.moveToFirst()){
+        try (android.database.Cursor cursor = getContentResolver().query(uri, null, null, null, null)) {
+            if (cursor != null && cursor.moveToFirst()) {
                 int index = cursor.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME);
                 displayName = cursor.getString(index);
             }
@@ -214,17 +207,16 @@ public class ChatActivity extends AppCompatActivity {
         // 发送完清空输入框
         etInputMsg.setText("");
     }
-    private void sendRaw(String content)
-    {
+
+    private void sendRaw(String content) {
         try {
-            if(outputStream!=null)
-            {
+            if (outputStream != null) {
                 outputStream.write(content.getBytes(StandardCharsets.UTF_8));
                 outputStream.flush();
 
             }
         } catch (IOException e) {
-            System.out.println("发送消息失败："+e.getMessage());
+            System.out.println("发送消息失败：" + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -232,12 +224,11 @@ public class ChatActivity extends AppCompatActivity {
     /**
      * 文件发送逻辑，运行在子线程
      */
-    private void sendFile(Uri fileUri,String fileName)
-    {
+    private void sendFile(Uri fileUri, String fileName) {
         try {
-            InputStream inputStream=getContentResolver().openInputStream(fileUri);
+            InputStream inputStream = getContentResolver().openInputStream(fileUri);
 
-            if(isImageFile(fileName)){
+            if (isImageFile(fileName)) {
                 // ========== 图片：使用 FILE_BASE64 协议 ==========
                 byte[] fileBytes = readAllBytesCompat(inputStream);
                 inputStream.close();
@@ -245,17 +236,17 @@ public class ChatActivity extends AppCompatActivity {
                 String header = "FILE_BASE64|" + fileName + "|" + base64Str + "\n";
                 sendRaw(header);
 
-                runOnUiThread(()->{
-                    tvMsgShow.append("【发送图片】"+fileName+" 发送完成\n");
+                runOnUiThread(() -> {
+                    tvMsgShow.append("【发送图片】" + fileName + " 发送完成\n");
                 });
-            }else{
+            } else {
                 // ========== 普通文件：保留原有 FILE| 二进制分片 ==========
-                byte[] buffer=new byte[4096];
+                byte[] buffer = new byte[4096];
                 int len;
-                long fileSize=inputStream.available();
-                String fileHeader= "FILE|" + fileName + "|" + fileSize + "\n";
+                long fileSize = inputStream.available();
+                String fileHeader = "FILE|" + fileName + "|" + fileSize + "\n";
                 sendRaw(fileHeader);
-                while ((len=inputStream.read(buffer))!=-1) {
+                while ((len = inputStream.read(buffer)) != -1) {
                     if (outputStream != null) {
                         outputStream.write(buffer, 0, len);
                         outputStream.flush();
@@ -263,36 +254,35 @@ public class ChatActivity extends AppCompatActivity {
                 }
                 inputStream.close();
 
-                runOnUiThread(()->{
-                    tvMsgShow.append("【发送文件】"+fileName+" 发送完成\n");
+                runOnUiThread(() -> {
+                    tvMsgShow.append("【发送文件】" + fileName + " 发送完成\n");
                 });
             }
 
         } catch (IOException e) {
             e.printStackTrace();
-            runOnUiThread(()->{
-                Toast.makeText(ChatActivity.this,"文件发送失败",Toast.LENGTH_SHORT).show();
+            runOnUiThread(() -> {
+                Toast.makeText(ChatActivity.this, "文件发送失败", Toast.LENGTH_SHORT).show();
             });
         }
 
 
     }
-    private void closeSocket()
-    {
+
+    private void closeSocket() {
         try {
-            if(outputStream!=null)
-            {
+            if (outputStream != null) {
                 outputStream.close();
             }
-            if(socket!=null)
-            {
+            if (socket != null) {
                 socket.close();
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        isConnect=false;
+        isConnect = false;
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -300,14 +290,14 @@ public class ChatActivity extends AppCompatActivity {
     }
 
 
-
-    private boolean isImageFile(String fileName){
+    private boolean isImageFile(String fileName) {
         String lower = fileName.toLowerCase();
         return lower.endsWith(".jpg") || lower.endsWith(".jpeg")
                 || lower.endsWith(".png") || lower.endsWith(".gif")
                 || lower.endsWith(".bmp") || lower.endsWith(".webp")
                 || lower.endsWith(".ico");
     }
+
     private void openFileSelector() {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
 
@@ -319,7 +309,6 @@ public class ChatActivity extends AppCompatActivity {
         fileChooseLauncher.launch(intent);
 
     }
-
 
 
     /**

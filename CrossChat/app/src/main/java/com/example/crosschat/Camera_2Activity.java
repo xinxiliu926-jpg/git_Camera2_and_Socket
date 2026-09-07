@@ -68,7 +68,6 @@ public class Camera_2Activity extends AppCompatActivity {
 
     // ========== 后台线程：相机操作不跑主线程 ==========
     private HandlerThread MyCameraThread;
-
     private Handler MyCameraHandler;//线程对应的handler;把回调分发到cameraThread线程执行
     // ========== UI相关 ==========
     private Surface MypreviewSurface; // 预览输出Surface，由TextureView的SurfaceTexture包装而来
@@ -82,7 +81,7 @@ public class Camera_2Activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera2);
         but_1 = findViewById(R.id.btn_take_photo);
-        but_2=findViewById(R.id.btn_view_photo);
+        but_2 = findViewById(R.id.btn_view_photo);
         mTtextureView = findViewById(R.id.textureView_preview);
 
 
@@ -121,22 +120,20 @@ public class Camera_2Activity extends AppCompatActivity {
     private void openPhotoViewer() {
 
 
-        if(photoPathList.isEmpty())
-        {
+        if (photoPathList.isEmpty()) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(Camera_2Activity.this,"还没有拍过照片",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Camera_2Activity.this, "还没有拍过照片", Toast.LENGTH_SHORT).show();
                 }
             });
         }
 
         Intent intent = new Intent(Camera_2Activity.this, ImagePreview_2_Activity.class);
 
-        intent.putStringArrayListExtra("photo_paths",new ArrayList<>(photoPathList));
+        intent.putStringArrayListExtra("photo_paths", new ArrayList<>(photoPathList));
         startActivity(intent);
     }
-
 
 
     /**
@@ -333,7 +330,7 @@ public class Camera_2Activity extends AppCompatActivity {
 
             byteBuffer.get(bytes);
 
-            image.close();// ⚠️极其重要，释放Image缓冲区，不写这里拍照只会执行一次然后卡死
+            image.close();
             savaImage(bytes); // 保存图片字节数组到本地文件
 
         }
@@ -346,10 +343,7 @@ public class Camera_2Activity extends AppCompatActivity {
      */
     private final CameraDevice.StateCallback cameraStateCallback = new CameraDevice.StateCallback() {
 
-        /**
-         * ✅相机打开成功！！
-         * 只有走到onOpened，cameraDevice对象才有效；下一步：创建CameraCaptureSession会话
-         */
+
         @Override
         public void onDisconnected(@NonNull CameraDevice camera) {
 
@@ -421,9 +415,7 @@ public class Camera_2Activity extends AppCompatActivity {
             });
         }
 
-        /**
-         * ✅会话配置成功！！到此，预览硬件通道全部就绪，可以发送预览请求
-         */
+
         @Override
         public void onConfigured(@NonNull CameraCaptureSession session) {
             try {

@@ -56,7 +56,7 @@ public class ClientHandler implements Runnable {
                     return;
                 }
             } else {
-                // 兼容旧客户端（如 Android）：直接发昵称/用户名，不做校验
+                
                 username = firstLine;
             }
 
@@ -141,9 +141,7 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    /**
-     * 向当前连接写一行（UTF-8 + 换行）
-     */
+   
     private void sendLine(String line) {
         try {
             OutputStream os = socket.getOutputStream();
