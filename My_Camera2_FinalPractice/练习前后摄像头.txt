@@ -1,0 +1,1 @@
+参考了https://github.com/Xposed-Modules-Repo/com.example.vcam.git，这个大佬的代码，和借助学习ai工具编写的练手demo。
