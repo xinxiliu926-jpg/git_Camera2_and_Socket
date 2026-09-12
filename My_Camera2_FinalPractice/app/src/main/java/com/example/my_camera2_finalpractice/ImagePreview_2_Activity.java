@@ -1,11 +1,10 @@
-package com.example.crosschat;
+package com.example.my_camera2_finalpractice;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.view.TextureView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -85,7 +84,7 @@ public class ImagePreview_2_Activity extends AppCompatActivity {
         if (drawable instanceof BitmapDrawable) {
             Bitmap oldBitmap = ((BitmapDrawable) drawable).getBitmap();
             if (oldBitmap != null && !oldBitmap.isRecycled()) {
-                oldBitmap.recycle();   // 你之前拿到了 oldBitmap 却没真正回收
+                oldBitmap.recycle();   //  你之前拿到了 oldBitmap 却没真正回收
             }
         }
 
@@ -128,3 +127,5 @@ public class ImagePreview_2_Activity extends AppCompatActivity {
         return BitmapFactory.decodeFile(path, decodeOptions);
     }
 }
+
+
