@@ -21,6 +21,7 @@ import android.media.ImageReader;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.util.Log;
 import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
@@ -39,6 +40,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import android.graphics.RectF;
 
 public class MY_Camera2 extends AppCompatActivity {
 
@@ -63,6 +65,7 @@ public class MY_Camera2 extends AppCompatActivity {
 
     private boolean isSwitching = false;//防止连续点击
     private Size mPreviewSize;
+    private int previewWidth, previewHeight;   // 预览尺寸，和拍照尺寸分开
     private int photoWidth, photoHeight;
     private CaptureRequest.Builder MypreviewRequestBuilder;
     private final List<String> photoPathList = new ArrayList<>();
@@ -229,7 +232,8 @@ public class MY_Camera2 extends AppCompatActivity {
     private void creatPrevwSession() {
 
         SurfaceTexture surfaceTexture = mTextureView.getSurfaceTexture();
-        surfaceTexture.setDefaultBufferSize(photoWidth, photoHeight);
+        if (surfaceTexture == null) return;
+        surfaceTexture.setDefaultBufferSize(previewWidth, previewHeight);
         MypreviewSurface = new Surface(surfaceTexture);
         List<Surface> surfaceList = new ArrayList<>();
         surfaceList.add(MypreviewSurface);
@@ -263,6 +267,9 @@ public class MY_Camera2 extends AppCompatActivity {
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
+        // 新增：预览配置好后，按预览比例修正显示。修正预览问题
+        runOnUiThread(() ->
+                configureTransform(mTextureView.getWidth(), mTextureView.getHeight()));
 
 
     }
@@ -334,25 +341,62 @@ public class MY_Camera2 extends AppCompatActivity {
         sensorOrientation = orientation != null ? orientation : 0;
 
         StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
-        Size[] sizes = map.getOutputSizes(ImageFormat.JPEG);
-        if (sizes == null || sizes.length == 0) {
-            sizes = map.getOutputSizes(SurfaceTexture.class);//没有照片尺寸获取预览的尺寸
-
+        // 改点A：拍照尺寸和预览尺寸分开算
+        // 1) 拍照(JPEG)尺寸：取最大
+        Size[] jpegSizes = map.getOutputSizes(ImageFormat.JPEG);
+        if (jpegSizes == null || jpegSizes.length == 0) {
+            jpegSizes = map.getOutputSizes(SurfaceTexture.class);
         }
-
-        Size largestSize = null;
-        for (Size size : sizes) {
-            if (largestSize == null
-                    || size.getWidth() * size.getHeight() > largestSize.getWidth() * largestSize.getHeight()) {
-                largestSize = size;
+        Size largestJpeg = jpegSizes[0];
+        for (Size s : jpegSizes) {
+            if (s.getWidth() * s.getHeight() > largestJpeg.getWidth() * largestJpeg.getHeight()) {
+                largestJpeg = s;
             }
         }
-        photoWidth = largestSize.getWidth();
-        photoHeight = largestSize.getHeight();
+        photoWidth = largestJpeg.getWidth();
+        photoHeight = largestJpeg.getHeight();
+
+        // 2) 预览尺寸：从 SurfaceTexture 支持的尺寸里挑（关键！）
+        Size preview = choosePreviewSize(map);
+        previewWidth = preview.getWidth();
+        previewHeight = preview.getHeight();
+
+        // 3) ImageReader 继续用 JPEG 尺寸（拍照不受影响）
         mImageReader = ImageReader.newInstance(photoWidth, photoHeight, ImageFormat.JPEG, 3);
         mImageReader.setOnImageAvailableListener(imageAvailableListener, mCameraHandler);
 
 
+    }
+
+    private Size choosePreviewSize(StreamConfigurationMap map) {
+        Size[] sizes = map.getOutputSizes(SurfaceTexture.class);
+        if (sizes == null || sizes.length == 0) {
+            return new Size(1920, 1080); // 兜底
+        }
+
+        int viewW = mTextureView.getWidth();
+        int viewH = mTextureView.getHeight();
+        float targetRatio = (viewW > 0 && viewH > 0) ? (float) viewW / viewH : 4f / 3f;
+
+        Size best = null;
+        float bestDiff = Float.MAX_VALUE;
+        for (Size s : sizes) {
+            float ratio = (float) s.getWidth() / s.getHeight();
+            float diff = Math.abs(ratio - targetRatio);
+            if (best == null) {
+                best = s;
+                bestDiff = diff;
+                continue;
+            }
+            if (diff < bestDiff - 0.05f
+                    || (Math.abs(diff - bestDiff) <= 0.05f
+                    && s.getWidth() * s.getHeight() > best.getWidth() * best.getHeight())) {
+                best = s;
+                bestDiff = diff;
+            }
+        }
+        Log.d("Camera2", "预览尺寸: " + best.getWidth() + " x " + best.getHeight());
+        return best;
     }
 
     private final ImageReader.OnImageAvailableListener imageAvailableListener = new ImageReader.OnImageAvailableListener() {
@@ -453,6 +497,7 @@ public class MY_Camera2 extends AppCompatActivity {
         @Override
         public void onSurfaceTextureSizeChanged(@NonNull SurfaceTexture surface, int width, int height) {
 
+            configureTransform(mTextureView.getWidth(), mTextureView.getHeight());
         }
 
         @Override
@@ -511,6 +556,35 @@ public class MY_Camera2 extends AppCompatActivity {
             mCameraThread = null;
             mCameraHandler = null;
         }
+    }
+
+
+    //预览画面变形问题-ai
+    private void configureTransform(int viewWidth, int viewHeight) {
+        if (mTextureView == null || previewWidth == 0 || previewHeight == 0) return;
+
+        int rotation = getWindowManager().getDefaultDisplay().getRotation();
+        Matrix matrix = new Matrix();
+        RectF viewRect = new RectF(0, 0, viewWidth, viewHeight);
+        float centerX = viewRect.centerX();
+        float centerY = viewRect.centerY();
+
+        if (rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) {
+            // 竖屏：先交换宽高，再旋转 90°/270°
+            RectF bufferRect = new RectF(0, 0, previewHeight, previewWidth);
+            bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY());
+            matrix.setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.FILL);
+             //Math.max = 裁剪铺满(全屏)；想留黑边就改成 Math.min
+            float scale = Math.min(
+
+                    (float) viewHeight / previewHeight,
+                    (float) viewWidth / previewWidth);
+            matrix.postScale(scale, scale, centerX, centerY);
+            matrix.postRotate(90 * (rotation - 2), centerX, centerY);
+        } else if (rotation == Surface.ROTATION_180) {
+            matrix.postRotate(180, centerX, centerY);
+        }
+        mTextureView.setTransform(matrix);
     }
 }
 
